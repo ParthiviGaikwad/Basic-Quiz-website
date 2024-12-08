@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create New Quiz</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container mt-5">
+    <h1 class="text-center">Create a New Quiz</h1>
+
+    <!-- Quiz Creation Form -->
+    <form id="quizForm" onsubmit="createQuiz(event)">
+        <div id="quizQuestionsContainer">
+            <!-- Dynamic Questions will be inserted here -->
+        </div>
+
+        <button type="submit" class="btn btn-primary mt-4">Create Quiz</button>
+    </form>
+</div>
+
+<script>
+// Function to dynamically create form fields for 5 questions
+function createQuizFormFields() {
+    const container = document.getElementById('quizQuestionsContainer');
+    
+    for (let i = 1; i <= 5; i++) {
+        const questionHTML = `
+            <div class="mb-4" id="question-${i}">
+                <label for="questionText${i}" class="form-label"><strong>Question ${i}</strong></label>
+                <input type="text" class="form-control" id="questionText${i}" placeholder="Enter the question" required>
+                <div class="mt-2">
+                    <label class="form-label"><strong>Options</strong></label>
+                    <input type="text" class="form-control mb-2" id="optionA${i}" placeholder="A) Option A" required>
+                    <input type="text" class="form-control mb-2" id="optionB${i}" placeholder="B) Option B" required>
+                    <input type="text" class="form-control mb-2" id="optionC${i}" placeholder="C) Option C" required>
+                    <input type="text" class="form-control mb-2" id="optionD${i}" placeholder="D) Option D" required>
+                </div>
+            </div>
+        `;
+        container.insertAdjacentHTML('beforeend', questionHTML);
+    }
+}
+
+// Function to create quiz webpage after form submission
+function createQuiz(event) {
+    event.preventDefault();
+
+    const quiz = {
+        title: "New Quiz",
+        questions: []
+    };
+
+    // Collect data from form inputs
+    for (let i = 1; i <= 5; i++) {
+        const questionText = document.getElementById(`questionText${i}`).value.trim();
+        const optionA = document.getElementById(`optionA${i}`).value.trim();
+        const optionB = document.getElementById(`optionB${i}`).value.trim();
+        const optionC = document.getElementById(`optionC${i}`).value.trim();
+        const optionD = document.getElementById(`optionD${i}`).value.trim();
+
+        quiz.questions.push({
+            question: questionText,
+            options: [optionA, optionB, optionC, optionD]
+        });
+    }
+
+    // Now create a new webpage displaying the quiz (as a new string of HTML)
+    const quizPageHTML = generateQuizPageHTML(quiz);
+
+    // Open the new quiz page in a new window
+    const newWindow = window.open();
+    newWindow.document.write(quizPageHTML);
+    newWindow.document.close();
+}
+
+// Function to generate the HTML for the quiz page
+function generateQuizPageHTML(quiz) {
+    let quizHTML = `
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>${quiz.title}</title>
+            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+        </head>
+        <body>
+        <div class="container mt-5">
+            <h1 class="text-center">${quiz.title}</h1>
+            <form id="quizForm">`;
+
+    quiz.questions.forEach((q, i) => {
+        quizHTML += `
+            <div class="mb-4">
+                <label class="form-label"><strong>${i + 1}. ${q.question}</strong></label>
+                ${q.options.map((option, index) => {
+                    return `
+                        <div>
+                            <input type="radio" name="q${i}" value="${option}" id="q${i}a${index}">
+                            <label for="q${i}a${index}">${String.fromCharCode(65 + index)}) ${option}</label><br>
+                    `}).join('')}
+            </div>`;
+    });
+
+    quizHTML += `
+            <button type="submit" class="btn btn-primary mt-4">Submit</button>
+        </form>
+        </div>
+        </body>
+        </html>
+    `;
+
+    return quizHTML;
+}
+
+// Initialize the form with questions
+createQuizFormFields();
+</script>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
